@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "base64-sol/base64.sol";
 
 contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
-    enum DroneElement {
+    enum DroneElementType {
         Fire,
         Water,
         Ice,
@@ -21,10 +21,52 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
     }
 
     struct DroneAttributes {
-        DroneElement[] elements;
+        /**
+         * Elements of the drone
+         * Type structure (example for type Light level 5):
+         * 0 0 0 0   0 0 0 0   0 1 0 1   0 1 1 0
+         *
+         * First 4 bytes (on the right) are reserved for the drone element type  (max of 16 types)
+         * Last 12 bytes (on the left)  are reserved for the drone element level (max of 4096 levels)
+         */
+        uint16[] elements;
         uint8 attacksPerSecond;
         uint8 attackDamages;
         uint8 attackRange;
+    }
+
+    function droneElementTypeToString(DroneElementType elementType)
+        internal
+        pure
+        returns (string memory)
+    {
+        if (elementType == DroneElementType.Fire) return "Fire";
+        if (elementType == DroneElementType.Water) return "Water";
+        if (elementType == DroneElementType.Ice) return "Ice";
+        if (elementType == DroneElementType.Electricity) return "Electricity";
+        if (elementType == DroneElementType.Earth) return "Earth";
+        if (elementType == DroneElementType.Wind) return "Wind";
+        if (elementType == DroneElementType.Light) return "Light";
+        if (elementType == DroneElementType.Dark) return "Dark";
+        return "Unknown";
+    }
+
+    function droneElementToString(uint32 element)
+        internal
+        pure
+        returns (string memory)
+    {
+        uint32 elementType = element & 0xF;
+        uint32 elementLevel = element >> 4;
+
+        return
+            string(
+                abi.encodePacked(
+                    droneElementTypeToString(DroneElementType(elementType)),
+                    " ",
+                    Strings.toString(elementLevel)
+                )
+            );
     }
 
     mapping(uint256 => DroneAttributes) private _drones;
@@ -50,7 +92,7 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
         uint256 numElements = (random(seed, "ELEMENTS") % 2) + 1;
 
         DroneAttributes memory attributes = DroneAttributes({
-            elements: new DroneElement[](numElements),
+            elements: new uint16[](numElements),
             attacksPerSecond: uint8(random(seed, "APERSECOND") % 3) + 1,
             attackDamages: uint8(random(seed, "ADAMAGES") % 20) + 5,
             attackRange: uint8(random(seed, "ARANGE") % 10) + 4
@@ -62,29 +104,16 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
                 string(abi.encodePacked("ELEMENTS_", Strings.toString(i)))
             );
 
-            attributes.elements[i] = DroneElement(uint256(rand % 8));
+            uint16 element = ((uint16(rand % 2) + 1) << 4) +
+                uint16(DroneElementType(rand % 8));
+
+            attributes.elements[i] = element;
         }
 
         _drones[id] = attributes;
         _safeMint(receiver, id);
 
         return id;
-    }
-
-    function elementToString(DroneElement element)
-        internal
-        pure
-        returns (string memory)
-    {
-        if (element == DroneElement.Fire) return "Fire";
-        if (element == DroneElement.Water) return "Water";
-        if (element == DroneElement.Ice) return "Ice";
-        if (element == DroneElement.Electricity) return "Electricity";
-        if (element == DroneElement.Earth) return "Earth";
-        if (element == DroneElement.Wind) return "Wind";
-        if (element == DroneElement.Light) return "Light";
-        if (element == DroneElement.Dark) return "Dark";
-        return "Unknown";
     }
 
     function tokenURI(uint256 tokenId)
@@ -109,8 +138,8 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
                 abi.encodePacked(
                     '<text x="10" dy="',
                     Strings.toString(i * 20),
-                    '" class="base">Element ',
-                    elementToString(drone.elements[j]),
+                    '" class="base">Element: ',
+                    droneElementToString(drone.elements[j]),
                     "</text>"
                 )
             );
