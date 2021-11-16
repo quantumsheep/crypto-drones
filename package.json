@@ -1,0 +1,28 @@
+{
+  "name": "crypto-drones",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quantumsheep/crypto-drones.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/quantumsheep/crypto-drones/issues"
+  },
+  "homepage": "https://github.com/quantumsheep/crypto-drones#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.3",
+    "base64-sol": "^1.1.0",
+    "truffle-assertions": "^0.9.2"
+  },
+  "devDependencies": {
+    "@openzeppelin/truffle-upgrades": "^1.11.0"
+  }
+}
