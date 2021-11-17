@@ -82,7 +82,7 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
 
     function mint() public nonReentrant returns (uint256) {
         require(
-            (owner() != _msgSender()) && balanceOf(_msgSender()) == 0,
+            (owner() == _msgSender()) || (balanceOf(_msgSender()) == 0),
             "CryptoDrones: You already have a drone"
         );
 
