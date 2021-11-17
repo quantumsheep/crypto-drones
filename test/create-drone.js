@@ -13,7 +13,7 @@ contract("CryptoDrones", (accounts) => {
     const baseSupply = await instance.totalSupply();
 
     await waitForEvent(
-      await instance.createDrone(),
+      await instance.mint(),
       'Transfer',
     );
 

@@ -80,7 +80,28 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
             );
     }
 
-    function createDrone() public nonReentrant returns (uint256) {
+    function mint() public nonReentrant returns (uint256) {
+        require(
+            balanceOf(msg.sender) == 0,
+            "CryptoDrones: You already have a drone"
+        );
+        return createDrone(msg.sender);
+    }
+
+    function mintOwner(address receiver)
+        public
+        nonReentrant
+        onlyOwner
+        returns (uint256)
+    {
+        require(
+            balanceOf(msg.sender) == 0,
+            "CryptoDrones: You already have a drone"
+        );
+        return createDrone(receiver);
+    }
+
+    function createDrone(address receiver) internal returns (uint256) {
         uint256 id = totalSupply();
 
         uint256 numElements = (random("ELEMENTS") % 2) + 1;
@@ -104,7 +125,7 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
         }
 
         _drones[id] = attributes;
-        _safeMint(msg.sender, id);
+        _safeMint(receiver, id);
 
         return id;
     }
