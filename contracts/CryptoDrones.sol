@@ -73,34 +73,27 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
 
     constructor() ERC721("CryptoDrones", "DRN") Ownable() {}
 
-    function random(string memory seed, string memory prefix)
-        internal
-        pure
-        returns (uint256)
-    {
-        return uint256(keccak256(abi.encodePacked(prefix, seed)));
+    function random(string memory prefix) internal view returns (uint256) {
+        return
+            uint256(
+                keccak256(abi.encodePacked(prefix, blockhash(block.number - 1)))
+            );
     }
 
-    function createDrone(string memory seed, address receiver)
-        public
-        nonReentrant
-        onlyOwner
-        returns (uint256)
-    {
+    function createDrone() public nonReentrant returns (uint256) {
         uint256 id = totalSupply();
 
-        uint256 numElements = (random(seed, "ELEMENTS") % 2) + 1;
+        uint256 numElements = (random("ELEMENTS") % 2) + 1;
 
         DroneAttributes memory attributes = DroneAttributes({
             elements: new uint16[](numElements),
-            attacksPerSecond: uint8(random(seed, "APERSECOND") % 3) + 1,
-            attackDamages: uint8(random(seed, "ADAMAGES") % 20) + 5,
-            attackRange: uint8(random(seed, "ARANGE") % 10) + 4
+            attacksPerSecond: uint8(random("APERSECOND") % 3) + 1,
+            attackDamages: uint8(random("ADAMAGES") % 20) + 5,
+            attackRange: uint8(random("ARANGE") % 10) + 4
         });
 
         for (uint256 i = 0; i < numElements; i++) {
             uint256 rand = random(
-                seed,
                 string(abi.encodePacked("ELEMENTS_", Strings.toString(i)))
             );
 
@@ -111,7 +104,7 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
         }
 
         _drones[id] = attributes;
-        _safeMint(receiver, id);
+        _safeMint(msg.sender, id);
 
         return id;
     }

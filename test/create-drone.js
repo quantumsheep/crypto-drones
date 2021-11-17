@@ -6,8 +6,6 @@ const waitForEvent = (result, eventType) => new Promise((resolve) => {
   truffleAssert.eventEmitted(result, eventType, resolve);
 });
 
-const generateSeed = () => crypto.randomBytes(32).toString('hex');
-
 contract("CryptoDrones", (accounts) => {
   it("should create a new drone", async () => {
     const instance = await CryptoDrones.deployed();
@@ -15,7 +13,7 @@ contract("CryptoDrones", (accounts) => {
     const baseSupply = await instance.totalSupply();
 
     await waitForEvent(
-      await instance.createDrone(generateSeed(), accounts[1]),
+      await instance.createDrone(),
       'Transfer',
     );
 
