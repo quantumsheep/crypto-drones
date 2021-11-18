@@ -140,7 +140,6 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
         parts[
             i++
         ] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" />';
-        // i++;
 
         for (uint256 j = 0; j < drone.elements.length; j++) {
             parts[i++] = string(
