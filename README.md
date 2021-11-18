@@ -15,10 +15,20 @@ Install node packages
 npm install
 ```
 
-Install truffle to the global scope
+Launch tests
 
 ```
-npm install --global truffle
+npx hardhat test
+```
+
+Compile
+```
+npx hardhat compile
+```
+
+Deploy
+```
+npx hardhat run scripts/deploy.ts
 ```
 
 ## Execute the program
