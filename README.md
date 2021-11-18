@@ -1,3 +1,32 @@
+# Crypto Drones
+
+A blockchain based video game
+
+## Requirements
+
+- Node
+- NPM
+
+## Installation
+
+Install node packages
+
+```
+npm install
+```
+
+Install truffle to the global scope
+
+```
+npm install --global truffle
+```
+
+## Execute the program
+
+```
+truffle 
+```
+
 # Advanced Sample Hardhat Project
 
 This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
