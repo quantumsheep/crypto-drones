@@ -81,12 +81,18 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
     }
 
     function mint() public nonReentrant returns (uint256) {
+        require(balanceOf(_msgSender()) == 0, "You already have a drone");
+        return createDrone(_msgSender());
+    }
+
+    function burn(uint256 id) public nonReentrant {
+        require(_exists(id), "Drone does not exist");
         require(
-            (owner() == _msgSender()) || (balanceOf(_msgSender()) == 0),
-            "CryptoDrones: You already have a drone"
+            ownerOf(id) == _msgSender(),
+            "You are not the owner of this drone"
         );
 
-        return createDrone(_msgSender());
+        _burn(id);
     }
 
     function mintOwner(address receiver)
@@ -125,63 +131,50 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
         return id;
     }
 
+    function tokenURILine(uint64 line, string memory data)
+        internal
+        pure
+        returns (string memory)
+    {
+        return
+            string(
+                abi.encodePacked(
+                    '<text x="10" dy="',
+                    line * 20,
+                    '" class="base">Element: ',
+                    data,
+                    "</text>"
+                )
+            );
+    }
+
     function tokenURI(uint256 tokenId)
         public
         view
         override
         returns (string memory)
     {
-        require(tokenId < totalSupply(), "CryptoDrones: Token must exists");
+        require(tokenId < totalSupply(), "Token must exists");
 
         DroneAttributes memory drone = _drones[tokenId];
 
         string[] memory parts = new string[](5 + drone.elements.length);
-        uint64 i = 0;
         parts[
-            i++
+            0
         ] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" />';
 
+        uint64 i = 1;
+
         for (uint256 j = 0; j < drone.elements.length; j++) {
-            parts[i++] = string(
-                abi.encodePacked(
-                    '<text x="10" dy="',
-                    Strings.toString(i * 20),
-                    '" class="base">Element: ',
-                    droneElementToString(drone.elements[j]),
-                    "</text>"
-                )
+            parts[i++] = tokenURILine(
+                i,
+                droneElementToString(drone.elements[j])
             );
         }
 
-        parts[i++] = string(
-            abi.encodePacked(
-                '<text x="10" dy="',
-                Strings.toString(i * 20),
-                '" class="base">Attacks Per Second: ',
-                Strings.toString(drone.attacksPerSecond),
-                "</text>"
-            )
-        );
-
-        parts[i++] = string(
-            abi.encodePacked(
-                '<text x="10" dy="',
-                Strings.toString(i * 20),
-                '" class="base">Attack Damages: ',
-                Strings.toString(drone.attackDamages),
-                "</text>"
-            )
-        );
-
-        parts[i++] = string(
-            abi.encodePacked(
-                '<text x="10" dy="',
-                Strings.toString(i * 20),
-                '" class="base">Attack Range: ',
-                Strings.toString(drone.attackRange),
-                "</text>"
-            )
-        );
+        parts[i++] = tokenURILine(i, Strings.toString(drone.attacksPerSecond));
+        parts[i++] = tokenURILine(i, Strings.toString(drone.attackDamages));
+        parts[i++] = tokenURILine(i, Strings.toString(drone.attackRange));
 
         parts[i++] = "</svg>";
 
