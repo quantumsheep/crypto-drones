@@ -15,6 +15,12 @@
       "off",
       "double"
     ],
-    "no-empty-blocks": "off"
+    "no-empty-blocks": "off",
+    "reason-string": [
+      "off",
+      {
+        "maxLength": 32
+      }
+    ]
   }
 }
