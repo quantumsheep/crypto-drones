@@ -125,6 +125,7 @@ dist
 .idea
 
 typechain
+typechain-types
 
 #Hardhat files
 cache
