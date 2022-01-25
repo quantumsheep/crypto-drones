@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "build": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.ts --network rinkeby"
   },
   "repository": {
     "type": "git",

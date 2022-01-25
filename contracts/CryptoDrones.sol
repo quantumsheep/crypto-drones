@@ -131,6 +131,11 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
         return id;
     }
 
+    function getDrone(uint256 id) public view returns (DroneAttributes memory) {
+        require(_exists(id), "Drone does not exist");
+        return _drones[id];
+    }
+
     function tokenURILine(uint64 line, string memory data)
         internal
         pure
@@ -154,7 +159,7 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
         override
         returns (string memory)
     {
-        require(tokenId < totalSupply(), "Token must exists");
+        require(_exists(tokenId), "Drone does not exist");
 
         DroneAttributes memory drone = _drones[tokenId];
 
