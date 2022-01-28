@@ -1,16 +1,15 @@
 import * as dotenv from "dotenv";
 
-import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-web3";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
+import { HardhatUserConfig, task } from "hardhat/config";
 import "solidity-coverage";
 
 dotenv.config();
 
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
 
@@ -18,6 +17,38 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
     console.log(account.address);
   }
 });
+
+task("drones-mint", "Mint a drone")
+  .addParam("account", "The account's address")
+  .addParam("address", "The contract's address")
+  .setAction(async (taskArgs, hre) => {
+    const { account, address } = taskArgs;
+
+    const Contract = await hre.ethers.getContractFactory("CryptoDrones");
+    const contract = Contract.attach(address);
+
+    const droneId = await contract.mintOwner(account);
+    console.log(droneId);
+  });
+
+task("drones-list", "Prints the list of drones")
+  .addParam("account", "The account's address")
+  .addParam("address", "The contract's address")
+  .setAction(async (taskArgs, hre) => {
+    const { account, address } = taskArgs;
+
+    const Contract = await hre.ethers.getContractFactory("CryptoDrones");
+    const contract = Contract.attach(address);
+
+    const balance = await contract.balanceOf(account);
+    console.log("Account balance:", balance.toString());
+
+    for (let i = 0; i < balance; i++) {
+      const droneID = await contract.tokenOfOwnerByIndex(account, i);
+      const drone = await contract.getDrone(droneID);
+      console.log(drone);
+    }
+  });
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
