@@ -5,7 +5,7 @@ import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-web3";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
-import { HardhatUserConfig, task } from "hardhat/config";
+import { HardhatUserConfig, task, types } from "hardhat/config";
 import "solidity-coverage";
 
 dotenv.config();
@@ -21,14 +21,17 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 task("drones-mint", "Mint a drone")
   .addParam("account", "The account's address")
   .addParam("address", "The contract's address")
+  .addParam("count", "How many drones to mint", 1, types.int, true)
   .setAction(async (taskArgs, hre) => {
-    const { account, address } = taskArgs;
+    const { account, address, count } = taskArgs;
 
     const Contract = await hre.ethers.getContractFactory("CryptoDrones");
     const contract = Contract.attach(address);
 
-    const droneId = await contract.mintOwner(account);
-    console.log(droneId);
+    for (let i = 0; i < count; i++) {
+      const droneId = await contract.mintOwner(account);
+      console.log(droneId);
+    }
   });
 
 task("drones-list", "Prints the list of drones")
