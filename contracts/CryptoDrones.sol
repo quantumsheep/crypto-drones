@@ -131,9 +131,44 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
         return id;
     }
 
-    function getDrone(uint256 id) public view returns (DroneAttributes memory) {
+    function getDrone(uint256 id) public view returns (string memory) {
         require(_exists(id), "Drone does not exist");
-        return _drones[id];
+
+        DroneAttributes memory attributes = _drones[id];
+
+        string memory elements = "[";
+
+        for (uint256 i = 0; i < attributes.elements.length; i++) {
+            elements = string(
+                abi.encodePacked(
+                    elements,
+                    '"',
+                    droneElementToString(attributes.elements[i]),
+                    '"',
+                    (i < (attributes.elements.length - 1)) ? ", " : ""
+                )
+            );
+        }
+
+        elements = string(abi.encodePacked(elements, "]"));
+
+        return
+            string(
+                abi.encodePacked(
+                    '{"id": "',
+                    Strings.toString(id),
+                    '"',
+                    ', "elements": ',
+                    elements,
+                    ', "attacksPerSecond": ',
+                    Strings.toString(attributes.attacksPerSecond),
+                    ', "attackDamages": ',
+                    Strings.toString(attributes.attackDamages),
+                    ', "attackRange": ',
+                    Strings.toString(attributes.attackRange),
+                    "}"
+                )
+            );
     }
 
     function tokenURILine(uint64 line, string memory data)
