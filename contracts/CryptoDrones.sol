@@ -76,7 +76,13 @@ contract CryptoDrones is ERC721Enumerable, Ownable, ReentrancyGuard {
     function random(string memory prefix) internal view returns (uint256) {
         return
             uint256(
-                keccak256(abi.encodePacked(prefix, blockhash(block.number - 1)))
+                keccak256(
+                    abi.encodePacked(
+                        prefix,
+                        blockhash(block.number - 1),
+                        totalSupply()
+                    )
+                )
             );
     }
 
